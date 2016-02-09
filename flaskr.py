@@ -92,8 +92,13 @@ def display_deck(slug):
     cur = db.execute ('select slug, title, content from decks where slug = ?', [slug])
     deck = cur.fetchone() #FIXME fetch, check return type
     if deck:
+        deck = dict(deck)
+        deck['slides'] = parse_deck_contents_into_slides(deck['content'])
         return render_template('single_deck.html', deck=deck)
     else:
         return render_template('404.html')
     
-    
+
+def parse_deck_contents_into_slides(deck_content):
+    slides = deck_content.splitlines()
+    return slides
