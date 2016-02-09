@@ -5,22 +5,22 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
 
-<link rel="{{ url_for('static', filename='theme/black.css') }}" id="theme">
-<script src="{{ url_for('static', filename='reveal.js') }}"></script>
+                <link rel="stylesheet" href="{{ url_for('static', filename='reveal.css') }}">
+                <link rel="stylesheet" href="{{ url_for('static', filename='black.css') }}" id="theme">
+                <script src="{{ url_for('static', filename='reveal.js') }}"></script>
+                <script src="{{ url_for('static', filename='head.min.js') }}"></script>
+                <script src="{{ url_for('static', filename='main.js') }}"></script>
 
   <!--
    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
    -->
   
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='reveal.css') }}">
+
+
 </head>
-<div class="page">
-  <h1>Instadeck</h1>
-  
   {% for message in get_flashed_messages() %}
     <div class="flash">{{ message }}</div>
     {% endfor %}
 <!-- reveal_layout is spliced w/ _block body_ here -->    
   {% block body %}{% endblock %}
 <!-- reveal_layout continues here -->
-</div>

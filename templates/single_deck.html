@@ -1,18 +1,16 @@
 {% extends "reveal_layout.html" %}
 {% block body %}
-<div class="deck">
   <!-- reveal.js invocations go here-->
   <div class="reveal">
     <div class="slides">
 
-  <h1>{{ deck.title }}</h1>
+  <section> <h1>{{ deck.title }}</h1> </section>
   {% for slide in deck.slides %}
     <section>
-      <h1> {{ slide }} </h1>
+      <h2> {{ slide }} </h2>
     </section>
   {% endfor %}
 
-  <p>{{ deck.content }}</p>
     </div>
   </div>
 {% endblock %}
