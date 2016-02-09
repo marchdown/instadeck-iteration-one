@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block body %}
+
+    <form action="{{url_for('add_deck') }}" method="post" class="add-deck">
+      <dl>
+        <dt>Title:
+        <dd><input type="text" size="60" name="title">
+        <dt>Content:
+        <dd><textarea name="content" rows="5" cols="40"></textarea>
+        <dd><input type="submit" value="Share">
+      </dl>
+    </form>
+
+  <ul class="decks">
+  {% for deck in decks %}
+    <li><em><a href="/{{ deck.slug }}">{{ deck.slug }}</a>::</em><h2>{{ deck.title }}</h2><br><br>{{ deck.content|safe }}
+  {% else %}
+    <li><em>Unbelievable.  No decks here so far</em>
+  {% endfor %}
+  </ul>
+{% endblock %}
