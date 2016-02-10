@@ -97,8 +97,8 @@ def display_deck(slug):
         return render_template('single_deck.html', deck=deck)
     else:
         return render_template('404.html')
-    
 
 def parse_deck_contents_into_slides(deck_content):
     slides = deck_content.splitlines()
-    return slides
+    non_empty_slides = [slide for slide in slides if slide] #remove empty lines (they are falsy).
+    return non_empty_slides
