@@ -65,7 +65,7 @@ def close_db(error):
 
 @app.route('/')
 def hello ():
-    return render_template("hello.html") # template, params
+    return render_template("welcome.html") # template, params
 
 @app.route('/list_decks')
 def list_decks():
@@ -82,7 +82,8 @@ def add_deck():
                [slug, request.form['title'], request.form['content']])
     db.commit()
     flash('New entry was successfully posted')
-    return redirect(url_for('list_decks'))
+#    return redirect(url_for('list_decks'))
+    return redirect('/'+slug)
 
 @app.route ('/<slug>')
 def display_deck(slug):
@@ -100,5 +101,6 @@ def display_deck(slug):
 
 def parse_deck_contents_into_slides(deck_content):
     slides = deck_content.splitlines()
+    # TODO: image and video processing code goes here
     non_empty_slides = [slide for slide in slides if slide] #remove empty lines (they are falsy).
     return non_empty_slides
