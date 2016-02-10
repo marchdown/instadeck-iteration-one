@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    Flaskr app
+    Instadeck app
     ~~~~~~
 """
 
@@ -17,14 +17,14 @@ app = Flask(__name__)
 
 # Load default config and override config from an environment variable
 app.config.update(dict(
-    DATABASE=os.path.join(app.root_path, 'flaskr.db'),
+    DATABASE=os.path.join(app.root_path, 'instadeck.db'),
     DEBUG=True,
     SECRET_KEY='development key',
     USERNAME='admin',
     PASSWORD='default'
 ))
-app.config.from_envvar('FLASKR_SETTINGS', silent=True)
-
+app.config.from_envvar('INSTADECK_SETTINGS', silent=True)
+# FIXME: what are this envvar? I'm not keeping anything in the environment.
 
 def connect_db():
     """Connects to the specific database."""
