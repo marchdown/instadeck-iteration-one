@@ -41,7 +41,7 @@ def init_db():
     db.commit()
 
 
-@app.cli.command('initdb')
+# @app.cli.command('initdb')
 def initdb_command():
     """Creates the database tables."""
     init_db()

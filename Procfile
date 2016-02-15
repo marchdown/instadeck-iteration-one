@@ -1,1 +1,2 @@
-web: python -m flask --app=instadeck run
+web: gunicorn instadeck:app
+
