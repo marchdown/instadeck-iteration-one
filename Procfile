@@ -1,1 +1,1 @@
-web: gunicorn -w 2 -b "0.0.0.0:$PORT" instadeck:app
+web: python -m flask --app=instadeck run
