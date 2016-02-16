@@ -6,7 +6,7 @@
 
   <section> <h1>{{ deck.title }}</h1> </section>
   {% for slide in deck.slides %}
-    <section>
+    <section data-background="https://source.unsplash.com/random">
       <h2> {{ slide }} </h2>
     </section>
   {% endfor %}
