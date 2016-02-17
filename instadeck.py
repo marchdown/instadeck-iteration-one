@@ -9,8 +9,27 @@ from hashlib import sha1 as sha1
 from sqlite3 import dbapi2 as sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash
+from flask.ext.sqlalchemy import SQLAlchemy
 
 # FIXME: what are g, abort, flash
+
+# FIXME: 
+# complete switching to sqlalchemy
+# cf http://blog.y3xz.com/blog/2012/08/16/flask-and-postgresql-on-heroku
+class Deck(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    slug =  db.Column(db.String(6))
+    title = db.Column(db.String(400))
+    content = db.Column(db.String(8000))
+
+    def __init__(self, title, content):
+        self.title = title
+        self.slug = slugify(contents)
+        self.contents = contents
+
+    def __repr__(self):
+        return '%r' % self.slug
+
 
 class Slide:
     def __init__(self, line):
@@ -26,13 +45,20 @@ class Slide:
 app = Flask(__name__)
 
 # Load default config and override config from an environment variable
+if ('DATABASE_URL' in os.environ):
+    squalchemy_database_uri = os.environ['DATABASE_URL']
+else:
+    squalchemy_database_uri="postgres://uquxyjlmmjtbff:aie93RAT7ZN2aAjYgyx5C-L2A1@ec2-107-20-224-236.compute-1.amazonaws.com:5432/d3v2ot3rmp4d5u"
 app.config.update(dict(
-    DATABASE=os.path.join(app.root_path, 'instadeck.db'),
+    SQLALCHEMY_DATABASE_URI=squalchemy_database_uri, #os.environ['DATABASE_URL'],
+#    DATABASE=os.path.join(app.root_path, 'instadeck.db'),
     DEBUG=True,
     SECRET_KEY='development key',
     USERNAME='admin',
     PASSWORD='default'
 ))
+db = SQLAlchemy(app)
+
 app.config.from_envvar('INSTADECK_SETTINGS', silent=True)
 # FIXME: what are this envvar? I'm not keeping anything in the environment.
 
@@ -84,9 +110,12 @@ def list_decks():
     decks = cur.fetchall()
     return render_template('list_decks.html', decks=decks)
 
+def slugify(content):
+    return sha1(content).hexdigest()[:6]
+
 @app.route('/add', methods=['POST'])
 def add_deck():
-    slug = sha1(request.form['content']).hexdigest()[:6] #FIXME concat title
+    slug = slugify(request.form['content'])
     db = get_db()
     db.execute('insert into decks (slug, title, content) values (?, ?, ?)',
                [slug, request.form['title'], request.form['content']])
