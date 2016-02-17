@@ -94,9 +94,24 @@ def add_deck():
     flash('New entry was successfully posted')
 #    return redirect(url_for('list_decks'))
     return redirect('/'+slug)
-
-@app.route ('/<slug>')
+@app.route ('/<slug>') # unsplash picture category
 def display_deck(slug):
+    ''' request a deck corresponding to a given slug, fill in deck template w/
+    (slug), title, content; redirect somewhere appropriate'''
+    db = get_db ()
+    cur = db.execute ('select slug, title, content from decks where slug = ?', \
+[slug])
+    deck = cur.fetchone() #FIXME fetch, check return type
+    if deck:
+        deck = dict(deck)
+        deck['pic'] = 'people'
+        deck['slides'] = parse_deck_contents_into_slides(deck['content'])
+        return render_template('single_deck.html', deck=deck)
+    else:
+        return render_template('404.html')
+
+@app.route ('/<slug>/<pic>') # unsplash picture category
+def display_deck_w_pic(slug, pic):
     ''' request a deck corresponding to a given slug, fill in deck template w/
     (slug), title, content; redirect somewhere appropriate'''
     db = get_db ()
@@ -104,6 +119,7 @@ def display_deck(slug):
     deck = cur.fetchone() #FIXME fetch, check return type
     if deck:
         deck = dict(deck)
+        deck['pic'] = pic
         deck['slides'] = parse_deck_contents_into_slides(deck['content'])
         return render_template('single_deck.html', deck=deck)
     else:
@@ -126,6 +142,16 @@ def youtube_url_validation(url):
         return youtube_regex_match.group(6)
 
     return youtube_regex_match
+
+def extract_img_url(url):
+    img_regex = (
+        r'([a-z\-_0-9\/\:\.]*\.(jpg|jpeg|png|gif)$)')
+    
+    img_regex_match = re.match(img_regex, url)
+    if img_regex_match:
+        return img_regex_match.group(1)
+    
+    return img_regex_match
 
 def vimeo_url_validation(url):
     vimeo_regex = (
@@ -151,13 +177,14 @@ def emb(line):
         return wrap_img_link(img_url)
     return None
 
-def extract_img_url(line):
-    return None
+def wrap_img_link(img_url):
+    return '<img src="' + img_url + '"/>'
 
 def wrap_youtube_link(youtube_url):
     return '<iframe width="420" height="315" src="https://www.youtube.com/embed/'+ youtube_url  +'" frameborder="0" allowfullscreen></iframe>'
     
-
+def wrap_vimeo_link(vimeo_id):
+    return '<iframe src="https://player.vimeo.com/video/'+ vimeo_id + '" width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>'
 
 
 
