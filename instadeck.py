@@ -4,13 +4,26 @@
     ~~~~~~
 """
 
-import os
+import os, re
 from hashlib import sha1 as sha1
 from sqlite3 import dbapi2 as sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash
 
+
+
 # FIXME: what are g, abort, flash
+class Slide:
+    def __init__(self, line):
+        embedded = get_embedded_url(line)
+        if embedded:
+            self.embedded = embedded
+        else:
+            self.embedded = None
+            self.text     = line
+
+
+
 
 # create our little application :)
 app = Flask(__name__)
@@ -104,3 +117,48 @@ def parse_deck_contents_into_slides(deck_content):
     # TODO: image and video processing code goes here
     non_empty_slides = [slide for slide in slides if slide] #remove empty lines (they are falsy).
     return non_empty_slides
+
+def youtube_url_validation(url):
+    youtube_regex = (
+        r'(https?://)?(www\.)?'
+        '(youtube|youtu|youtube-nocookie)\.(com|be)/'
+        '(watch\?v=|embed/|v/|.+\?v=)?([^&=%\?]{11})')
+
+    youtube_regex_match = re.match(youtube_regex, url)
+    if youtube_regex_match:
+        return youtube_regex_match.group(6)
+
+    return youtube_regex_match
+
+def vimeo_url_validation(url):
+    vimeo_regex = (
+        r'(?:https?\:\/\/)?(?:www\.)?(?:vimeo\.com\/)([0-9]+)')
+
+    vimeo_regex_match = re.match(vimeo_regex, url)
+    if vimeo_regex_match:
+        return vimeo_regex_match.group(1) 
+
+    return vimeo_regex_match
+
+
+def emb(line):
+    youtube_url = youtube_url_validation(line) 
+    vimeo_url = vimeo_url_validation(line)
+    img_url = extract_img_url(line) #FIXME: return None
+    if (youtube_url):
+        return wrap_youtube_link(youtube_url)
+    if (vimeo_url):
+        return wrap_vimeo_link(vimeo_url)
+    if (img_url):
+        return wrap_img_link(img_url)
+    
+def extract_img_url(line):
+    return None
+
+def wrap_youtube(youtube_url):
+    return '<iframe width="420" height="315" src="https://www.youtube.com/embed/'+ youtube_url  +'" frameborder="0" allowfullscreen></iframe>'
+    
+
+
+
+
