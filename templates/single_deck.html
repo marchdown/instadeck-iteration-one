@@ -8,11 +8,11 @@
   {% for slide in deck.slides %}
     {% if not slide.embedded %}
     <section data-background="https://source.unsplash.com/random">
-      <h2> {{ slide }} </h2>
+      <h2> {{ slide.text }} </h2>
     </section>
     {% else %}
     <section>
-      <h2> {{ slide.embedded }} </h2>
+      {{ slide.embedded|safe }}
     </section>
     {% endif %}
 

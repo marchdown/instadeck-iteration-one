@@ -10,19 +10,16 @@ from sqlite3 import dbapi2 as sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash
 
-
-
 # FIXME: what are g, abort, flash
+
 class Slide:
     def __init__(self, line):
-        embedded = get_embedded_url(line)
+        embedded = emb(line)
         if embedded:
             self.embedded = embedded
         else:
             self.embedded = None
             self.text     = line
-
-
 
 
 # create our little application :)
@@ -115,7 +112,7 @@ def display_deck(slug):
 def parse_deck_contents_into_slides(deck_content):
     slides = deck_content.splitlines()
     # TODO: image and video processing code goes here
-    non_empty_slides = [slide for slide in slides if slide] #remove empty lines (they are falsy).
+    non_empty_slides = [Slide(line) for line in slides if line] #remove empty lines (they are falsy).
     return non_empty_slides
 
 def youtube_url_validation(url):
@@ -142,6 +139,7 @@ def vimeo_url_validation(url):
 
 
 def emb(line):
+    ''' return an html element with video or image or None '''
     youtube_url = youtube_url_validation(line) 
     vimeo_url = vimeo_url_validation(line)
     img_url = extract_img_url(line) #FIXME: return None
@@ -151,11 +149,12 @@ def emb(line):
         return wrap_vimeo_link(vimeo_url)
     if (img_url):
         return wrap_img_link(img_url)
-    
+    return None
+
 def extract_img_url(line):
     return None
 
-def wrap_youtube(youtube_url):
+def wrap_youtube_link(youtube_url):
     return '<iframe width="420" height="315" src="https://www.youtube.com/embed/'+ youtube_url  +'" frameborder="0" allowfullscreen></iframe>'
     
 
