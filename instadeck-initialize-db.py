@@ -5,6 +5,9 @@ from hashlib import sha1 as sha1
 from flask.ext.sqlalchemy import SQLAlchemy
 from instadeck import slugify #FIXME: import Deck
 
+app = Flask(__name__)
+db = SQLAlchemy(app)
+
 class Deck(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True) # does postgres support autoincrement?
     slug =  db.Column(db.String(6))
