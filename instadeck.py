@@ -9,7 +9,7 @@ from hashlib import sha1 as sha1
 from sqlite3 import dbapi2 as sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.sqlalchemy import SQLAlchemy as db
 
 # FIXME: what are g, abort, flash
 
