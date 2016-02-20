@@ -45,12 +45,12 @@ class Deck(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True) # does postgres support autoincrement?
     slug =  db.Column(db.String(6))
     title = db.Column(db.String(400))
-    unparsed_content = db.Column(db.String(8000)) #FIXME: think of appropriate size
-    def __init__(self, title, content):
+    slides = db.Column(db.String(8000)) #FIXME: think of appropriate size
+    def __init__(self, title, slides):
         self.title = title
-        self.slug = slugify(contents)
-        self.content = unparsed_content
-
+        self.slides = slides
+        self.slug = slugify(slides)
+        
     def __repr__(self):
 #        return '%r <> %r' % self.slug, self.title
         return '%r' % self.slug
@@ -64,52 +64,13 @@ class Slide:
             self.embedded = None
             self.text     = line
 
-            
-def connect_db():
-    """Connects to the specific database."""
-    rv = sqlite3.connect(app.config['DATABASE'])
-    rv.row_factory = sqlite3.Row
-    return rv
-
-
-def init_db():
-    """Initializes the database."""
-    db = get_db()
-    with app.open_resource('schema.sql', mode='r') as f:
-        db.cursor().executescript(f.read())
-    db.commit()
-
-
-# @app.cli.command('initdb')
-def initdb_command():
-    """Creates the database tables."""
-    init_db()
-    print('Initialized the database.')
-
-
-def get_db():
-    """Opens a new database connection if there is none yet for the
-    current application context.
-    """
-    if not hasattr(g, 'sqlite_db'):
-        g.sqlite_db = connect_db()
-    return g.sqlite_db
-
-
-@app.teardown_appcontext
-def close_db(error):
-    """Closes the database again at the end of the request."""
-    if hasattr(g, 'sqlite_db'):
-        g.sqlite_db.close()
-
 @app.route('/')
 def hello ():
     return render_template("welcome.html") # template, params
 
 @app.route('/list_decks')
 def list_decks():
-    db = get_db()
-    cur = db.execute('select slug, title, content from decks order by id desc')
+    cur = db.engine.execute('select slug, title, slides from decks order by id desc')
     decks = cur.fetchall()
     return render_template('list_decks.html', decks=decks)
 
@@ -119,25 +80,36 @@ def slugify(content):
 @app.route('/add', methods=['POST'])
 def add_deck():
     slug = slugify(request.form['content'])
-    db = get_db()
-    db.execute('insert into decks (slug, title, content) values (?, ?, ?)',
-               [slug, request.form['title'], request.form['content']])
-    db.commit()
+#    db.engine.execute('insert into decks (slug, title, slides) values (?, ?, ?)',
+#               [slug, request.form['title'], request.form['content']])
+    db.session.add(Deck(request.form['title'],request.form['content']))
+    db.session.commit()
     flash('New entry was successfully posted')
 #    return redirect(url_for('list_decks'))
     return redirect('/'+slug)
+
 @app.route ('/<slug>') # unsplash picture category
 def display_deck(slug):
     ''' request a deck corresponding to a given slug, fill in deck template w/
     (slug), title, content; redirect somewhere appropriate'''
-    db = get_db ()
-    cur = db.execute ('select slug, title, content from decks where slug = ?', \
-[slug])
-    deck = cur.fetchone() #FIXME fetch, check return type
+ #   cur = db.engine.execute ('select slug, title, slides from decks where slug = ?', [slug])
+ #   deck = cur.fetchone() #FIXME fetch, check return type
+
+ # slug_query = db.aliased(Deck, slug=slug)
+ #    deck_query = db.session.query(Deck, Deck.slug, slug_query)
+ #    deck = deck_query.get(1)
+
+    deck = Deck.query.filter_by(slug=slug).first()
+    print "#### deck returned: ", deck.slides, type(deck)
+
+    # if deck:
+    #     deck = dict(deck)
+    #     deck['pic'] = 'people'
+    #     deck['slides'] = parse_deck_contents_into_slides(deck['content']) # content -> slides
+    #     return render_template('single_deck.html', deck=deck)
     if deck:
-        deck = dict(deck)
-        deck['pic'] = 'people'
-        deck['slides'] = parse_deck_contents_into_slides(deck['content'])
+#        deck.pic = 'people'
+        deck.slides =  parse_deck_contents_into_slides(deck.slides) # content -> slides
         return render_template('single_deck.html', deck=deck)
     else:
         return render_template('404.html')
@@ -146,8 +118,7 @@ def display_deck(slug):
 def display_deck_w_pic(slug, pic):
     ''' request a deck corresponding to a given slug, fill in deck template w/
     (slug), title, content; redirect somewhere appropriate'''
-    db = get_db ()
-    cur = db.execute ('select slug, title, content from decks where slug = ?', [slug])
+    cur = db.engine.execute ('select slug, title, content from decks where slug = ?', [slug])
     deck = cur.fetchone() #FIXME fetch, check return type
     if deck:
         deck = dict(deck)
@@ -217,6 +188,3 @@ def wrap_youtube_link(youtube_url):
     
 def wrap_vimeo_link(vimeo_id):
     return '<iframe src="https://player.vimeo.com/video/'+ vimeo_id + '" width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>'
-
-
-
