@@ -9,13 +9,38 @@ from hashlib import sha1 as sha1
 from sqlite3 import dbapi2 as sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash
-from flask.ext.sqlalchemy import SQLAlchemy as db
+from flask.ext.sqlalchemy import SQLAlchemy
 
 # FIXME: what are g, abort, flash
 
 # FIXME: 
 # complete switching to sqlalchemy
 # cf http://blog.y3xz.com/blog/2012/08/16/flask-and-postgresql-on-heroku
+
+# create our little application :)
+app = Flask(__name__)
+db = SQLAlchemy(app)
+
+
+
+# Load default config and override config from an environment variable
+if ('DATABASE_URL' in os.environ):
+    squalchemy_database_uri = os.environ['DATABASE_URL']
+else:
+    raise Exception("Can't find database URI in os.environ")
+    squalchemy_database_uri="postgres://uquxyjlmmjtbff:aie93RAT7ZN2aAjYgyx5C-L2A1@ec2-107-20-224-236.compute-1.amazonaws.com:5432/d3v2ot3rmp4d5u"
+app.config.update(dict(
+    SQLALCHEMY_DATABASE_URI=squalchemy_database_uri, #os.environ['DATABASE_URL'],
+#    DATABASE=os.path.join(app.root_path, 'instadeck.db'),
+    DEBUG=True,
+    SECRET_KEY='development key',
+    USERNAME='admin',
+    PASSWORD='default'
+))
+db = SQLAlchemy(app)
+
+app.config.from_envvar('INSTADECK_SETTINGS', silent=True)
+# FIXME: what are this envvar? I'm not keeping anything in the environment.
 class Deck(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True) # does postgres support autoincrement?
     slug =  db.Column(db.String(6))
@@ -39,29 +64,7 @@ class Slide:
             self.embedded = None
             self.text     = line
 
-
-# create our little application :)
-app = Flask(__name__)
-
-# Load default config and override config from an environment variable
-if ('DATABASE_URL' in os.environ):
-    squalchemy_database_uri = os.environ['DATABASE_URL']
-else:
-    raise Exception("Can't find database URI in os.environ")
-    squalchemy_database_uri="postgres://uquxyjlmmjtbff:aie93RAT7ZN2aAjYgyx5C-L2A1@ec2-107-20-224-236.compute-1.amazonaws.com:5432/d3v2ot3rmp4d5u"
-app.config.update(dict(
-    SQLALCHEMY_DATABASE_URI=squalchemy_database_uri, #os.environ['DATABASE_URL'],
-#    DATABASE=os.path.join(app.root_path, 'instadeck.db'),
-    DEBUG=True,
-    SECRET_KEY='development key',
-    USERNAME='admin',
-    PASSWORD='default'
-))
-db = SQLAlchemy(app)
-
-app.config.from_envvar('INSTADECK_SETTINGS', silent=True)
-# FIXME: what are this envvar? I'm not keeping anything in the environment.
-
+            
 def connect_db():
     """Connects to the specific database."""
     rv = sqlite3.connect(app.config['DATABASE'])
