@@ -17,19 +17,18 @@ from flask.ext.sqlalchemy import SQLAlchemy
 # complete switching to sqlalchemy
 # cf http://blog.y3xz.com/blog/2012/08/16/flask-and-postgresql-on-heroku
 class Deck(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True) # does postgres support autoincrement?
     slug =  db.Column(db.String(6))
     title = db.Column(db.String(400))
-    content = db.Column(db.String(8000))
-
+    unparsed_content = db.Column(db.String(8000)) #FIXME: think of appropriate size
     def __init__(self, title, content):
         self.title = title
         self.slug = slugify(contents)
-        self.contents = contents
+        self.content = unparsed_content
 
     def __repr__(self):
+#        return '%r <> %r' % self.slug, self.title
         return '%r' % self.slug
-
 
 class Slide:
     def __init__(self, line):
@@ -48,6 +47,7 @@ app = Flask(__name__)
 if ('DATABASE_URL' in os.environ):
     squalchemy_database_uri = os.environ['DATABASE_URL']
 else:
+    raise Exception("Can't find database URI in os.environ")
     squalchemy_database_uri="postgres://uquxyjlmmjtbff:aie93RAT7ZN2aAjYgyx5C-L2A1@ec2-107-20-224-236.compute-1.amazonaws.com:5432/d3v2ot3rmp4d5u"
 app.config.update(dict(
     SQLALCHEMY_DATABASE_URI=squalchemy_database_uri, #os.environ['DATABASE_URL'],
