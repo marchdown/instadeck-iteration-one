@@ -3,7 +3,22 @@ import os, re
 from flask import Flask
 from hashlib import sha1 as sha1
 from flask.ext.sqlalchemy import SQLAlchemy
-from instadeck import slugify, Deck
+from instadeck import slugify #FIXME: import Deck
+
+class Deck(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True) # does postgres support autoincrement?
+    slug =  db.Column(db.String(6))
+    title = db.Column(db.String(400))
+    slides = db.Column(db.String(8000)) #FIXME: think of appropriate size
+    def __init__(self, title, slides):
+        self.title = title
+        self.slides = slides
+        self.slug = slugify(slides)
+        
+    def __repr__(self):
+#        return '%r <> %r' % self.slug, self.title
+        return '%r' % self.slug
+
 
 
 #import SQLAlchemy

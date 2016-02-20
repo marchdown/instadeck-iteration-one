@@ -10,6 +10,7 @@ from sqlite3 import dbapi2 as sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash
 from flask.ext.sqlalchemy import SQLAlchemy
+#FIXME: import Deck from instadeck-initialize-db
 
 # FIXME: what are g, abort, flash
 
