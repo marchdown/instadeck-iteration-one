@@ -1,26 +1,30 @@
 {% extends "layout.html" %}
 
 {% block body %}
-<body>
-  <div id="lead">
-  <!-- Lead-in blurb goes here -->
-  Instadeck is an awesome‡ new service that accelerates your presentation design to the speed of thought.
-  Simply write your pitch in the text field below.
-  Each line turns into a separate slide. You can paste urls to images and videos, and they are automatically emdebbed into slides of their own.
-  <br>
-  ‡<a href="/multitude">Feel the awe!</a>
-<!-- -->
-</div>
-  <div id="new_deck">
-    <form action="{{  url_for('add_deck') }}" method="post" class="add-deck">
-      <dl>
-        <dt>Title:
-        <dd><input type="text" size="40" name="title">
-        <dt>Content:
-        <dd><textarea name="content" rows="5" cols="40"></textarea>
-        <dd><input type="submit" value="Share">
-      </dl>
-    </form>
-  </div>
+<body>  
+  <div class="container">
+    <div class="row">
+      <div id="lead" class="col-lg-6">
+      <!-- Lead-in blurb goes here -->
+      Instadeck is an awesome‡ new service that accelerates your presentation design to the speed of thought.
+      Simply write your pitch in the text field below.
+      Each line turns into a separate slide. You can paste urls to images and videos, and they are automatically emdebbed into slides of their own.
+      <br>
+      ‡<a href="/multitude">Feel the awe!</a>
+    <!-- -->
+     </div>
+      <div id="new_deck" class="col-lg-6">
+        <form action="{{  url_for('add_deck') }}" method="post" class="add-deck">
+          <dl>
+            <dt>Title:
+            <dd><input type="text" size="40" name="title">
+            <dt>Content:
+            <dd><textarea name="content" rows="5" cols="40"></textarea>
+            <dd><input type="submit" value="Share">
+          </dl>
+        </form>
+      </div>
+     </div>
+    </div>
 </body>
   {% endblock %}
