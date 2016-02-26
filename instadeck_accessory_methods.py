@@ -1,4 +1,5 @@
 import re
+import urllib2
 from hashlib import sha1
 
 def slugify(content):
@@ -17,7 +18,11 @@ def emb(line):
         return wrap_img_link(img_url)
     return None
 
-
+def request_a_new_picture_url_from_unsplash(filter):
+    unsplash_url = "https://source.unsplash.com/random"
+    #FIXME: add timeout here. maybe have a default picture.
+    final_picture_url = urllib2.urlopen(urllib2.Request(unsplash_url)).geturl()
+    return final_picture_url
 
 def youtube_url_validation(url):
     youtube_regex = (

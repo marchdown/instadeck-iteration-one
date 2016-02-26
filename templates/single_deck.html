@@ -7,7 +7,7 @@
   <section> <h1>{{ deck.title }}</h1> </section>
   {% for slide in deck.slides %}
     {% if not slide.embedded %}
-    <section data-background="https://source.unsplash.com/category/{{ deck.pic }}/1600x900">
+    <section data-background="{{  slide.pic  }}">
       <h2> {{ slide.text }} </h2>
     </section>
     {% else %}

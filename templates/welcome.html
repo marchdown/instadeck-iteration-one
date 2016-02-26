@@ -4,25 +4,29 @@
 <body>  
   <div class="container">
     <div class="row">
-      <div id="lead" class="col-lg-6">
+      <div id="lead" class="col-md-6">
       <!-- Lead-in blurb goes here -->
       Instadeck is an awesome‡ new service that accelerates your presentation design to the speed of thought.
       Simply write your pitch in the text field below.
       Each line turns into a separate slide. You can paste urls to images and videos, and they are automatically emdebbed into slides of their own.
       <br>
-      ‡<a href="/multitude">Feel the awe!</a>
+      ‡<a href="/867b5e">Feel the awe!</a>
     <!-- -->
      </div>
-      <div id="new_deck" class="col-lg-6">
-        <form action="{{  url_for('add_deck') }}" method="post" class="add-deck">
+      <div id="new_deck" class="col-md-6">
+        <div class="form-group">
+
+        <form action="{{  url_for('add_deck') }}" method="post" class="add-deck" class="form-control">
           <dl>
             <dt>Title:
-            <dd><input type="text" size="40" name="title">
+            <dd><input type="text" name="title" class="form-control">
             <dt>Content:
-            <dd><textarea name="content" rows="5" cols="40"></textarea>
-            <dd><input type="submit" value="Share">
+            <dd><textarea name="content" rows="5" class="form-control" ></textarea>
+              <br>
+            <dd><input type="submit" value="Turn this into a deck!" class="btn">
           </dl>
         </form>
+        </div>
       </div>
      </div>
     </div>

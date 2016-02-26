@@ -1,6 +1,7 @@
+from urllib import urlopen
 # used in instadeck-initialize-db.py and instadeck.py
 from flask.ext.sqlalchemy import SQLAlchemy
-from instadeck_accessory_methods import slugify, emb
+from instadeck_accessory_methods import slugify, emb, request_a_new_picture_url_from_unsplash
 db = SQLAlchemy()
 
 class Deck(db.Model):
@@ -13,7 +14,7 @@ class Deck(db.Model):
         self.title = title
         self.slides = slides
         self.slug = slugify(slides)
-        self.pic = None
+        self.pic = request_a_new_picture_url_from_unsplash(filter="")
     def __repr__(self):
 #        return '%r <> %r' % self.slug, self.title
         return '%r' % self.slug

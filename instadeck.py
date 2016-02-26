@@ -11,7 +11,7 @@ from instadeck_accessory_methods import slugify
 
 # create our little application and a corresponding database connection
 app = Flask(__name__)
-db = SQLAlchemy(app)
+
 
 # Load default config and override config from an environment variable
 if ('DATABASE_URL' in os.environ):
@@ -33,7 +33,9 @@ app.config.update(dict(
 
 app.config.from_envvar('INSTADECK_SETTINGS', silent=True)
 # FIXME: what is this envvar? I'm not keeping anything in the environment. I should though.
-
+db = SQLAlchemy(app)
+# FIXME: check whether we can get any data out db.query().count()
+print "using %r for database", squalchemy_database_uri
 
 @app.route('/')
 def hello ():
@@ -48,27 +50,41 @@ def list_decks():
 
 @app.route('/add', methods=['POST'])
 def add_deck():
-    slug = slugify(request.form['content'])
+    title = request.form['title']
+    content = request.form['content']
+    slug = slugify(content)
+    print("adding deck with slug "+slug+" and title "+title)
 #    db.engine.execute('insert into decks (slug, title, slides) values (?, ?, ?)',
 #               [slug, request.form['title'], request.form['content']])
-    db.session.add(Deck(request.form['title'],request.form['content']))
+    deck = Deck(title, content)
+    db.session.add(deck)
     db.session.commit()
+    #test whether the deck has been saved correctly
+
+    deck_gotten_back_from_the_database = Deck.query.filter_by(slug=slug).first()
+    assert(title==deck_gotten_back_from_the_database.title)
+    print "#### deck saved: ", deck.slides, type(deck)
 #    return redirect(url_for('list_decks'))
     return redirect('/'+slug)
+@app.route ('/favicon.ico')
+def return_favicon():
+    return 'static/favicon.ico'
 
 @app.route ('/<slug>') # unsplash picture category
 def display_deck(slug):
     ''' request a deck corresponding to a given slug, fill in deck template w/
     (slug), title, content; redirect somewhere appropriate'''
+    print "asked to display deck "+slug+"!"
  #   cur = db.engine.execute ('select slug, title, slides from decks where slug = ?', [slug])
  #   deck = cur.fetchone() #FIXME fetch, check return type
 
  # slug_query = db.aliased(Deck, slug=slug)
  #    deck_query = db.session.query(Deck, Deck.slug, slug_query)
  #    deck = deck_query.get(1)
-
-    deck = Deck.query.filter_by(slug=slug).first()
-    print "#### deck returned: ", deck.slides, type(deck)
+    query = db.session.query(Deck)
+    deck = query.filter_by(slug=slug).first()
+    assert(deck)
+#    print "#### deck returned: ", deck.slides, type(deck)
 
     # if deck:
     #     deck = dict(deck)
